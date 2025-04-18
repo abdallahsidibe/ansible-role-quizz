@@ -1,30 +1,63 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for role-quiz
-- name: Mettre à jour tous les paquets
+---
+- name: Mettre à jour tous les paquets (RedHat)
+  when: ansible_os_family == "RedHat"
   dnf:
     name: '*'
     state: latest
     update_cache: yes
 
-- name: Installer Git et les outils nécessaires
+- name: Mettre à jour tous les paquets (Debian)
+  when: ansible_os_family == "Debian"
+  apt:
+    upgrade: dist
+    update_cache: yes
+
+- name: Installer les paquets nécessaires (RedHat)
+  when: ansible_os_family == "RedHat"
   dnf:
     name:
       - git
       - procps-ng
     state: present
 
+- name: Installer les paquets nécessaires (Debian)
+  when: ansible_os_family == "Debian"
+  apt:
+    name:
+      - git
+      - procps
+    state: present
+    update_cache: yes
+
 - name: Télécharger le script d'installation Node.js 23
   get_url:
     url: https://rpm.nodesource.com/setup_23.x
     dest: /tmp/setup_node.sh
     mode: '0755'
+  when: ansible_os_family == "RedHat"
+
+- name: Télécharger le script Node.js (Debian)
+  get_url:
+    url: https://deb.nodesource.com/setup_23.x
+    dest: /tmp/setup_node.sh
+    mode: '0755'
+  when: ansible_os_family == "Debian"
 
 - name: Exécuter le script Node.js
   command: bash /tmp/setup_node.sh
 
-- name: Installer Node.js
+- name: Installer Node.js (RedHat)
+  when: ansible_os_family == "RedHat"
   dnf:
+    name: nodejs
+    state: present
+
+- name: Installer Node.js (Debian)
+  when: ansible_os_family == "Debian"
+  apt:
     name: nodejs
     state: present
 
@@ -56,4 +89,3 @@
     chdir: /opt/quiz-ansible
   async: 3600
   poll: 0
-
