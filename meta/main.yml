@@ -2,6 +2,7 @@
 galaxy_info:
   role_name: role-quiz
   author: shatri
+  namespace: abdallahsidibe
   description: Deploy a quiz app for ansible learners
   company: phoenix tech
 
